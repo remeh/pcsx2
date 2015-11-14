@@ -359,7 +359,6 @@ typedef void DynGenFunc();
 static DynGenFunc* DispatcherEvent		= NULL;
 static DynGenFunc* DispatcherReg		= NULL;
 static DynGenFunc* JITCompile			= NULL;
-static DynGenFunc* JITCompileInBlock	= NULL;
 static DynGenFunc* EnterRecompiledCode	= NULL;
 static DynGenFunc* ExitRecompiledCode	= NULL;
 static DynGenFunc* DispatchBlockDiscard = NULL;
@@ -432,13 +431,6 @@ static DynGenFunc* _DynGen_JITCompile()
 	xMOV( ecx, ptr[recLUT + (eax*4)] );
 	xJMP( ptr32[ecx+ebx] );
 
-	return (DynGenFunc*)retval;
-}
-
-static DynGenFunc* _DynGen_JITCompileInBlock()
-{
-	u8* retval = xGetAlignedCallTarget();
-	xJMP( JITCompile );
 	return (DynGenFunc*)retval;
 }
 
@@ -563,7 +555,6 @@ static void _DynGen_Dispatchers()
 	DispatcherReg	= _DynGen_DispatcherReg();
 
 	JITCompile           = _DynGen_JITCompile();
-	JITCompileInBlock    = _DynGen_JITCompileInBlock();
 	EnterRecompiledCode  = _DynGen_EnterRecompiledCode();
 	DispatchBlockDiscard = _DynGen_DispatchBlockDiscard();
 	DispatchPageReset    = _DynGen_DispatchPageReset();
@@ -1725,8 +1716,7 @@ static void __fastcall recRecompile( const u32 startpc )
 	
 	s_pCurBlock = PC_GETBLOCK(startpc);
 
-	pxAssert(s_pCurBlock->GetFnptr() == (uptr)JITCompile
-		|| s_pCurBlock->GetFnptr() == (uptr)JITCompileInBlock);
+	pxAssert(s_pCurBlock->GetFnptr() == (uptr)JITCompile);
 
 	s_pCurBlockEx = recBlocks.Get(HWADDR(startpc));
 	pxAssert(!s_pCurBlockEx || s_pCurBlockEx->startpc != HWADDR(startpc));
@@ -1826,7 +1816,7 @@ static void __fastcall recRecompile( const u32 startpc )
 				break;
 			}
 
-			if (pblock->GetFnptr() != (uptr)JITCompile && pblock->GetFnptr() != (uptr)JITCompileInBlock)
+			if (pblock->GetFnptr() != (uptr)JITCompile)
 			{
 				willbranch3 = 1;
 				s_nEndBlock = i;
@@ -2118,11 +2108,6 @@ StartRecomp:
 	}
 
 	s_pCurBlock->SetFnptr((uptr)recPtr);
-
-	for(i = 1; i < (u32)s_pCurBlockEx->size; i++) {
-		if ((uptr)JITCompile == s_pCurBlock[i].GetFnptr())
-			s_pCurBlock[i].SetFnptr((uptr)JITCompileInBlock);
-	}
 
 	if( !(pc&0x10000000) )
 		maxrecmem = std::max( (pc&~0xa0000000), maxrecmem );

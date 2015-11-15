@@ -525,6 +525,7 @@ static DynGenFunc* _DynGen_EnterRecompiledCode()
 static DynGenFunc* _DynGen_DispatchBlockDiscard()
 {
 	u8* retval = xGetPtr();
+	EMMS();
 	xCALL(dyna_block_discard);
 	xJMP(ExitRecompiledCode);
 	return (DynGenFunc*)retval;
@@ -533,6 +534,7 @@ static DynGenFunc* _DynGen_DispatchBlockDiscard()
 static DynGenFunc* _DynGen_DispatchPageReset()
 {
 	u8* retval = xGetPtr();
+	EMMS();
 	xCALL(dyna_page_reset);
 	xJMP(ExitRecompiledCode);
 	return (DynGenFunc*)retval;
@@ -849,13 +851,6 @@ void R5900::Dynarec::OpcodeImpl::recBREAK()
 // Size is in dwords (4 bytes)
 void recClear(u32 addr, u32 size)
 {
-	// necessary since recompiler doesn't call femms/emms
-#ifdef _MSC_VER
-	__asm emms;
-#else
-	__asm__ __volatile__("emms");
-#endif
-
 	addr = HWADDR(addr);
 	u32 end = addr + size * 4 - 4;
 	recBlocks.RemoveRange(end, addr, end, PC_GETBLOCK(addr & ~0xFFF));

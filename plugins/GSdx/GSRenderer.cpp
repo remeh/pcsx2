@@ -37,6 +37,7 @@ GSRenderer::GSRenderer()
 	, m_texture_shuffle(false)
 	, m_wnd(NULL)
 	, m_dev(NULL)
+	, m_osd(NULL)
 {
 	m_GStitleInfoBuffer[0] = 0;
 
@@ -64,6 +65,10 @@ GSRenderer::~GSRenderer()
 	{
 		delete m_wnd;
 	}
+
+	if (m_osd) {
+		delete m_osd;
+	}
 }
 
 bool GSRenderer::CreateWnd(const string& title, int w, int h)
@@ -84,6 +89,18 @@ bool GSRenderer::CreateDevice(GSDevice* dev)
 	m_dev = dev;
 	m_dev->SetVSync(m_vsync && m_framelimit);
 
+	return true;
+}
+
+bool GSRenderer::CreateOSD(GSDevice* dev, std::string font_filepath) {
+	ASSERT(dev);
+
+	if (font_filepath.size() == 0) {
+		// TODO(remy): interop way to do that
+		font_filepath = "res/FreeSans.ttf";
+	}
+
+	m_osd->init(font_filepath);
 	return true;
 }
 

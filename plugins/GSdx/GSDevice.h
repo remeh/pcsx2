@@ -22,6 +22,7 @@
 #pragma once
 
 #include "GSWnd.h"
+#include "GSOSD.h"
 #include "GSTexture.h"
 #include "GSVertex.h"
 #include "GSAlignedClass.h"
@@ -111,6 +112,7 @@ class GSDevice : public GSAlignedClass<32>
 
 protected:
 	GSWnd* m_wnd;
+
 	bool m_vsync;
 	bool m_rbswapped;
 	GSTexture* m_backbuffer;
@@ -134,6 +136,7 @@ protected:
 	virtual void DoFXAA(GSTexture* sTex, GSTexture* dTex) {}
 	virtual void DoShadeBoost(GSTexture* sTex, GSTexture* dTex) {}
 	virtual void DoExternalFX(GSTexture* sTex, GSTexture* dTex) {}
+	virtual void DoOSD(GSTexture* sTex, GSTexture* dTex) {}
 
 public:
 	GSDevice();
@@ -188,6 +191,7 @@ public:
 	void FXAA();
 	void ShadeBoost();
 	void ExternalFX();
+	void OSD();
 
 	bool ResizeTexture(GSTexture** t, int w, int h);
 

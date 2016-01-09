@@ -86,6 +86,8 @@ set(GSdxSources
     GSLinuxDialog.cpp
     GSLocalMemory.cpp
 	GSLzma.cpp
+    GSOSD.cpp
+    GSOSDOGL.cpp
     GSPerfMon.cpp
     GSPng.cpp
     GSRasterizer.cpp
@@ -155,6 +157,8 @@ set(GSdxHeaders
     GSFunctionMap.h
     GSLinuxLogo.h
     GSLocalMemory.h
+    GSOSD.h
+    GSOSDOGL.h
     GSPerfMon.h
     GSRasterizer.h
     GSRenderer.h

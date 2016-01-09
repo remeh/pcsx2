@@ -410,13 +410,13 @@ bool GSDevice::ResizeTexture(GSTexture** t, int w, int h)
 		*t = t2;
 	}
 
-	return t2 != NULL;
+return t2 != NULL;
 }
 
 GSAdapter::operator std::string() const
 {
-	char buf[sizeof "12345678:12345678:12345678:12345678"];
-	sprintf(buf, "%.4X:%.4X:%.8X:%.2X", vendor, device, subsys, rev);
+char buf[sizeof "12345678:12345678:12345678:12345678"];
+sprintf(buf, "%.4X:%.4X:%.8X:%.2X", vendor, device, subsys, rev);
 	return buf;
 }
 

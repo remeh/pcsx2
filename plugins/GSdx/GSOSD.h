@@ -1,0 +1,72 @@
+/*
+ *	Copyright (C) 2015 Rémy Mathieu
+ *
+ *  This Program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2, or (at your option)
+ *  any later version.
+ *
+ *  This Program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with GNU Make; see the file COPYING.  If not, write to
+ *  the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA USA.
+ *  http://www.gnu.org/copyleft/gpl.html
+ *
+ */
+
+#pragma once
+
+#include "stdafx.h"
+#include <string>
+#include "GSTexture.h"
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
+#define GSOSD_FONT_SIZE 32
+
+class GSOSD {
+	protected:
+		bool active; // is the OSD feature active
+
+		struct GlyphInfo {
+				uint32 width;
+				uint32 height;
+
+				uint32 left;
+				uint32 top;
+
+				uint32 rendered_width; // offset to apply for the next rendering
+				uint32 rendered_height; // offset to apply for the next rendering
+		};
+
+		struct Atlas {
+			bool generated;
+
+			uint32 width;
+			uint32 height;
+
+			struct GlyphInfo glyphsInfo[96];
+		} atlas;
+
+
+		GSTexture* m_atlas_tex;
+
+		void createAtlas();
+		void destroyRes();
+
+		virtual bool generateAtlasTexture() = 0;
+
+		// NOTE(remy): does FT works correctly on Windows?
+		FT_Library ft;
+		FT_Face face; // loaded font
+
+	public:
+		GSOSD();
+		virtual ~GSOSD();
+
+		void init(std::string font_filepath);
+};

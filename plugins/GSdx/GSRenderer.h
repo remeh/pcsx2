@@ -55,6 +55,7 @@ protected:
 public:
 	GSWnd* m_wnd;
 	GSDevice* m_dev;
+	GSOSD* m_osd;
 
 public:
 	GSRenderer();
@@ -62,6 +63,7 @@ public:
 
 	virtual bool CreateWnd(const string& title, int w, int h);
 	virtual bool CreateDevice(GSDevice* dev);
+	virtual bool CreateOSD(GSDevice* dev, std::string font_filepath = "");
 	virtual void ResetDevice();
 	virtual void VSync(int field);
 	virtual bool MakeSnapshot(const string& path);

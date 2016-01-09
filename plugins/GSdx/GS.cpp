@@ -28,6 +28,7 @@
 #include "GSDeviceOGL.h"
 #include "GSRendererOGL.h"
 #include "GSRendererCL.h"
+#include "GSOSDOGL.h"
 
 #ifdef _WINDOWS
 
@@ -475,6 +476,14 @@ static int _GSopen(void** dsp, const char* title, GSRendererType renderer, int t
 		GSclose();
 
 		return -1;
+	}
+
+	// instanciate the OSD, ATM only supports OpenGL
+	// TODO(remy): add an option to (de)activate the OSD,
+	// and an option to choose a font ?
+	if (renderer == GSRendererType::OGL_HW) {
+		s_gs->m_osd = new GSOSDOGL(dev);
+		s_gs->CreateOSD(dev);
 	}
 
 	if (renderer == GSRendererType::OGL_HW && theApp.GetConfig("debug_glsl_shader", 0) == 2) {

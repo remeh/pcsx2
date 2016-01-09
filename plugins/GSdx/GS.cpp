@@ -478,13 +478,8 @@ static int _GSopen(void** dsp, const char* title, GSRendererType renderer, int t
 		return -1;
 	}
 
-	// instanciate the OSD, ATM only supports OpenGL
-	// TODO(remy): add an option to (de)activate the OSD,
-	// and an option to choose a font ?
-	if (renderer == GSRendererType::OGL_HW) {
-		s_gs->m_osd = new GSOSDOGL(dev);
-		s_gs->CreateOSD(dev);
-	}
+	// TODO(remy): configuration on / off + fonts filepath
+	dev->CreateOSD("/usr/share/fonts/TTF/FreeSans.ttf");
 
 	if (renderer == GSRendererType::OGL_HW && theApp.GetConfig("debug_glsl_shader", 0) == 2) {
 		printf("GSdx: test OpenGL shader. Please wait...\n\n");

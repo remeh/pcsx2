@@ -484,6 +484,8 @@ class GSDeviceOGL : public GSDevice
 	void Flip();
 	void SetVSync(bool enable);
 
+	void CreateOSD(std::string font_filepath);
+
 	void DrawPrimitive();
 	void DrawPrimitive(int offset, int count);
 	void DrawIndexedPrimitive();

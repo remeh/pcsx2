@@ -55,7 +55,6 @@ protected:
 public:
 	GSWnd* m_wnd;
 	GSDevice* m_dev;
-	GSOSD* m_osd;
 
 public:
 	GSRenderer();

@@ -22,25 +22,35 @@
 
 #include "stdafx.h"
 #include <string>
+#include <vector>
 #include "GSTexture.h"
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
 #define GSOSD_FONT_SIZE 32
+#define GSOSD_MAX_LINES 6 
 
 class GSOSD {
 	protected:
 		bool active; // is the OSD feature active
 
+		struct OSDLine {
+			std::string text;
+			// TODO(remy): color ?
+			time_t expiration_time;
+		};
+
+		std::vector<OSDLine> lines;
+
 		struct GlyphInfo {
-				uint32 width;
-				uint32 height;
+			uint32 width;
+			uint32 height;
 
-				uint32 left;
-				uint32 top;
+			uint32 left;
+			uint32 top;
 
-				uint32 rendered_width; // offset to apply for the next rendering
-				uint32 rendered_height; // offset to apply for the next rendering
+			uint32 rendered_width; // offset to apply for the next rendering
+			uint32 rendered_height; // offset to apply for the next rendering
 		};
 
 		struct Atlas {
@@ -52,15 +62,13 @@ class GSOSD {
 			struct GlyphInfo glyphsInfo[96];
 		} atlas;
 
-
 		GSTexture* m_atlas_tex;
+
 
 		void createAtlas();
 		void destroyRes();
 
-		virtual bool generateAtlasTexture() = 0;
 
-		// NOTE(remy): does FT works correctly on Windows?
 		FT_Library ft;
 		FT_Face face; // loaded font
 
@@ -69,4 +77,7 @@ class GSOSD {
 		virtual ~GSOSD();
 
 		void init(std::string font_filepath);
+
+		void addLine(std::string text, uint32 seconds);
+		void clear();
 };

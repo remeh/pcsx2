@@ -37,7 +37,6 @@ GSRenderer::GSRenderer()
 	, m_texture_shuffle(false)
 	, m_wnd(NULL)
 	, m_dev(NULL)
-	, m_osd(NULL)
 {
 	m_GStitleInfoBuffer[0] = 0;
 
@@ -64,10 +63,6 @@ GSRenderer::~GSRenderer()
 	if (m_wnd)
 	{
 		delete m_wnd;
-	}
-
-	if (m_osd) {
-		delete m_osd;
 	}
 }
 
@@ -100,7 +95,7 @@ bool GSRenderer::CreateOSD(GSDevice* dev, std::string font_filepath) {
 		font_filepath = "res/FreeSans.ttf";
 	}
 
-	m_osd->init(font_filepath);
+	dev->CreateOSD(font_filepath);
 	return true;
 }
 

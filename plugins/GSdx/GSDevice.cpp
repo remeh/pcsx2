@@ -25,6 +25,7 @@
 
 GSDevice::GSDevice()
 	: m_wnd(NULL)
+	, m_osd(NULL)
 	, m_vsync(false)
 	, m_rbswapped(false)
 	, m_backbuffer(NULL)
@@ -54,6 +55,10 @@ GSDevice::~GSDevice()
 	delete m_fxaa;
 	delete m_shadeboost;
 	delete m_1x1;
+
+	if (m_osd) {
+		delete m_osd;
+	}
 }
 
 bool GSDevice::Create(GSWnd* wnd)
@@ -77,6 +82,11 @@ bool GSDevice::Reset(int w, int h)
 	delete m_fxaa;
 	delete m_shadeboost;
 	delete m_1x1;
+
+	if (m_osd) {
+		delete m_osd;
+		m_osd = NULL;
+	}
 
 	m_backbuffer = NULL;
 	m_merge = NULL;

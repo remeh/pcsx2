@@ -22,6 +22,7 @@
 #include "stdafx.h"
 #include "GSDeviceOGL.h"
 #include "GLState.h"
+#include "GSOSDOGL.h"
 #include <fstream>
 
 #include "res/glsl_source.h"
@@ -432,6 +433,19 @@ bool GSDeviceOGL::Reset(int w, int h)
 	m_backbuffer = new GSTextureOGL(GSTextureOGL::Backbuffer, w, h, 0, m_fbo_read);
 
 	return true;
+}
+
+void GSDeviceOGL::CreateOSD(std::string font_filepath)
+{
+
+	GL_PUSH("GSDeviceOGL::OSD");
+
+	GSOSDOGL* osd = new GSOSDOGL(m_fbo_read);
+	osd->init(font_filepath);
+	osd->generateAtlasTexture();
+	m_osd = osd;
+
+	GL_POP();
 }
 
 void GSDeviceOGL::SetVSync(bool enable)

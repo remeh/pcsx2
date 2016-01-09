@@ -19,18 +19,29 @@
  */
 
 #include "GSOSDOGL.h"
+#include "GSTextureOGL.h"
 
-GSOSDOGL::GSOSDOGL(GSDevice* device) : GSOSD()
+GSOSDOGL::GSOSDOGL(GLuint fbo_read) :
+	GSOSD()
+	, m_fbo_read(fbo_read)
 {
-	m_device = device;
 }
 
 GSOSDOGL::~GSOSDOGL()
 {
 }
 
-bool GSOSDOGL::generateAtlasTexture() {
+bool GSOSDOGL::generateAtlasTexture()
+{
 	printf("GSOSD: Generating OGL atlas texture.\n");
+
+	// note that createAtlas has already
+	// destroy the old texture.
+	m_atlas_tex = new GSTextureOGL(GSTextureOGL::Texture, atlas.width, atlas.height, GL_R8, m_fbo_read);
+
 	// TODO(remy): generate the atlas texture.
+
+	atlas.generated = true;
 	return true;
 }
+

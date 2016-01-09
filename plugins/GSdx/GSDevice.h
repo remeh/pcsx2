@@ -112,6 +112,7 @@ class GSDevice : public GSAlignedClass<32>
 
 protected:
 	GSWnd* m_wnd;
+	GSOSD* m_osd;
 
 	bool m_vsync;
 	bool m_rbswapped;
@@ -152,6 +153,8 @@ public:
 	virtual void Present(const GSVector4i& r, int shader);
 	virtual void Present(GSTexture* sTex, GSTexture* dTex, const GSVector4& dRect, int shader = 0);
 	virtual void Flip() {}
+
+	virtual void CreateOSD(std::string font_filepath) {};
 
 	virtual void SetVSync(bool enable) {m_vsync = enable;}
 

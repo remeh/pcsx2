@@ -32,6 +32,8 @@ GSOSD::GSOSD() :
 GSOSD::~GSOSD()
 {
 	destroyRes();
+
+	FT_Done_FreeType(ft);
 }
 
 // init inits the font rendering dependency,
@@ -75,6 +77,8 @@ void GSOSD::init(std::string font_filepath)
 // of GSOSD.
 void GSOSD::destroyRes()
 {
+	lines.clear();
+
 	if (m_atlas_tex) {
 		delete m_atlas_tex;
 		m_atlas_tex = NULL;
@@ -109,7 +113,8 @@ void GSOSD::createAtlas()
 		}
 
 		if (!face->glyph) {
-			// can't render this glyph ?! consider critical for the OSD subsystem.
+			// can't render this glyph ?! consider critical for the OSD subsystem ATM.
+			// but something can be done to deal with it.
 			// TODO(remy): log
 			active = false;
 			return;
@@ -129,15 +134,25 @@ void GSOSD::createAtlas()
 
 		atlas.glyphsInfo[i-32] = info;
 	}
+}
 
+// clear removes all the displayed line.
+void GSOSD::clear() {
+	lines.clear();
+}
 
-	if (!generateAtlasTexture())  {
-		printf("GSOSD: generate the atlas texture.");
-		// error while generating the atlas texture.
-		// TODO(remy): log
-		active = false;
+// addLine inserts a new line to display into the OSD.
+// If the OSD has too many lines to display, it can
+// decide to remove some.
+void GSOSD::addLine(std::string text, uint32 seconds) {
+	if (lines.size() == GSOSD_MAX_LINES) {
+		lines.erase(lines.begin());
 	}
 
-	// atlas correctly generated
-	atlas.generated = true;
+	OSDLine line;
+	line.text = text;
+	// TODO(remy): compute the expiration time.
+	line.expiration_time = seconds;
+
+	lines.push_back(line);
 }

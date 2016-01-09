@@ -20,17 +20,17 @@
 
 #pragma once
 
-#include "GSDevice.h"
+#include "GSTextureOGL.h"
 #include "GSOSD.h"
 
 class GSOSDOGL : public GSOSD {
 	private:
 	protected:
-		GSDevice* m_device;
-
-		bool generateAtlasTexture(); 
+		GLuint m_fbo_read;
 
 	public:
-		GSOSDOGL(GSDevice* device);
+		GSOSDOGL(GLuint m_fbo_read);
 		virtual ~GSOSDOGL();
+
+		bool generateAtlasTexture();
 };

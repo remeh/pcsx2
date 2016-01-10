@@ -96,8 +96,6 @@ void GSOSD::createAtlas()
 		destroyRes();
 	}
 
-	// NOTE(remy): does NPOT textures affect the perf ?
-
 	// we'll regenerate the atlas
 	atlas.generated = false;
 	atlas.width = atlas.height = 0;
@@ -120,9 +118,6 @@ void GSOSD::createAtlas()
 			return;
 		}
 
-		// store useful information of the atlas
-		atlas.width += face->glyph->bitmap.width;
-		atlas.height = std::max(atlas.height, face->glyph->bitmap.rows);
 
 		// store the glyph info
 		struct GlyphInfo info;
@@ -131,6 +126,11 @@ void GSOSD::createAtlas()
 		info.height = face->glyph->bitmap.rows;
 		info.rendered_width = face->glyph->advance.x >> 6;
 		info.rendered_height = face->glyph->advance.y >> 6;
+		info.x_offset = atlas.width;
+
+		// store useful information of the atlas
+		atlas.width += face->glyph->bitmap.width;
+		atlas.height = std::max(atlas.height, face->glyph->bitmap.rows);
 
 		atlas.glyphsInfo[i-32] = info;
 	}

@@ -51,6 +51,8 @@ class GSOSD {
 
 			uint32 rendered_width; // offset to apply for the next rendering
 			uint32 rendered_height; // offset to apply for the next rendering
+
+			uint32 x_offset;
 		};
 
 		struct Atlas {

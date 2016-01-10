@@ -36,12 +36,22 @@ bool GSOSDOGL::generateAtlasTexture()
 	printf("GSOSD: Generating OGL atlas texture.\n");
 
 	// note that createAtlas has already
-	// destroy the old texture.
+	// destroyed the old texture.
 	m_atlas_tex = new GSTextureOGL(GSTextureOGL::Texture, atlas.width, atlas.height, GL_R8, m_fbo_read);
 
-	// TODO(remy): generate the atlas texture.
+	// NOTE(remy): does NPOT textures affect the perf ?
+	for (uint32 i = 0; i < countof(atlas.glyphsInfo); i++) {
+		if (FT_Load_Char(face, i+32, FT_LOAD_RENDER)) {
+			continue;
+		}
+
+		GlyphInfo glyph = atlas.glyphsInfo[i];
+		GSVector4i r(glyph.x_offset, 0, glyph.x_offset + glyph.width, glyph.height);
+		m_atlas_tex->Update(r, face->glyph->bitmap.buffer, glyph.height);
+	}
+
+	printf("GSOSDOGL: created a texture of %dx%d\n", m_atlas_tex->GetWidth(), m_atlas_tex->GetHeight());
 
 	atlas.generated = true;
 	return true;
 }
-

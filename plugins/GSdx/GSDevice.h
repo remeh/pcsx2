@@ -125,6 +125,7 @@ protected:
 	GSTexture* m_shadeboost;
 	GSTexture* m_1x1;
 	GSTexture* m_current;
+
 	struct {size_t stride, start, count, limit;} m_vertex;
 	struct {size_t start, count, limit;} m_index;
 	unsigned int m_frame; // for ageing the pool
@@ -137,7 +138,7 @@ protected:
 	virtual void DoFXAA(GSTexture* sTex, GSTexture* dTex) {}
 	virtual void DoShadeBoost(GSTexture* sTex, GSTexture* dTex) {}
 	virtual void DoExternalFX(GSTexture* sTex, GSTexture* dTex) {}
-	virtual void DoOSD(GSTexture* sTex, GSTexture* dTex) {}
+	virtual void DoOSD(GSTexture* dTex) {}
 
 public:
 	GSDevice();
@@ -154,7 +155,7 @@ public:
 	virtual void Present(GSTexture* sTex, GSTexture* dTex, const GSVector4& dRect, int shader = 0);
 	virtual void Flip() {}
 
-	virtual void CreateOSD(std::string font_filepath) {};
+	virtual void CreateOSD(std::string) {}
 
 	virtual void SetVSync(bool enable) {m_vsync = enable;}
 

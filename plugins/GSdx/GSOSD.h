@@ -62,14 +62,13 @@ class GSOSD {
 			uint32 height;
 
 			struct GlyphInfo glyphsInfo[96];
-		} atlas;
+		} m_atlas;
 
 		GSTexture* m_atlas_tex;
-
+		GSTexture* m_osd_tex;
 
 		void createAtlas();
 		void destroyRes();
-
 
 		FT_Library ft;
 		FT_Face face; // loaded font
@@ -82,4 +81,5 @@ class GSOSD {
 
 		void addLine(std::string text, uint32 seconds);
 		void clear();
+		virtual void render() = 0;
 };

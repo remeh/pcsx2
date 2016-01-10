@@ -22,15 +22,21 @@
 #include "GSOSD.h"
 
 GSOSD::GSOSD() :
-	active(false),
-	m_atlas_tex(NULL),
-	ft(NULL)
+	active(false)
+	, m_atlas_tex(NULL)
+	, m_osd_tex(NULL)
+	, ft(NULL)
 {
-	memset(atlas.glyphsInfo, 0, sizeof(atlas.glyphsInfo));
+	Atlas atlas;
+	atlas.generated = false;
+	atlas.width = atlas.height = 0;
+	m_atlas = atlas;
+	printf("GSOSD()\n");
 }
 
 GSOSD::~GSOSD()
 {
+	printf("~GSOSD()\n");
 	destroyRes();
 
 	FT_Done_FreeType(ft);
@@ -68,7 +74,7 @@ void GSOSD::init(std::string font_filepath)
 	createAtlas();
 
 	// error while generating the atlas ? no atlas, no osd.
-	if (!atlas.generated) {
+	if (!m_atlas.generated) {
 		active = false;
 	}
 }
@@ -96,9 +102,13 @@ void GSOSD::createAtlas()
 		destroyRes();
 	}
 
+	printf("GSOSD: createAtlas()\n");
+
+	memset(m_atlas.glyphsInfo, 0, sizeof(m_atlas.glyphsInfo));
+
 	// we'll regenerate the atlas
-	atlas.generated = false;
-	atlas.width = atlas.height = 0;
+	m_atlas.generated = false;
+	m_atlas.width = m_atlas.height = 0;
 
 	// compute the char infos and store the height of the taller glyph
 	// skip 32 first chars which are control char
@@ -106,6 +116,7 @@ void GSOSD::createAtlas()
 		// Load a char (and render it with FT_LOAD_RENDER flag)
 		if (FT_Load_Char(face, i, FT_LOAD_RENDER)) {
 			// TODO(remy): log
+			printf("Can't load char %d\n", i);
 			active = false;
 			return;
 		}
@@ -114,6 +125,7 @@ void GSOSD::createAtlas()
 			// can't render this glyph ?! consider critical for the OSD subsystem ATM.
 			// but something can be done to deal with it.
 			// TODO(remy): log
+			printf("Can't render a glyph: %d\n", i);
 			active = false;
 			return;
 		}
@@ -126,14 +138,16 @@ void GSOSD::createAtlas()
 		info.height = face->glyph->bitmap.rows;
 		info.rendered_width = face->glyph->advance.x >> 6;
 		info.rendered_height = face->glyph->advance.y >> 6;
-		info.x_offset = atlas.width;
+		info.x_offset = m_atlas.width;
 
 		// store useful information of the atlas
-		atlas.width += face->glyph->bitmap.width;
-		atlas.height = std::max(atlas.height, face->glyph->bitmap.rows);
+		m_atlas.width += face->glyph->bitmap.width;
+		m_atlas.height = std::max(m_atlas.height, face->glyph->bitmap.rows);
 
-		atlas.glyphsInfo[i-32] = info;
+		m_atlas.glyphsInfo[i-32] = info;
 	}
+
+	printf("GSOSD: createAtlas() done.\n");
 }
 
 // clear removes all the displayed line.
@@ -155,4 +169,6 @@ void GSOSD::addLine(std::string text, uint32 seconds) {
 	line.expiration_time = seconds;
 
 	lines.push_back(line);
+
+	render();
 }

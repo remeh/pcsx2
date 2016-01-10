@@ -393,6 +393,8 @@ class GSDeviceOGL : public GSDevice
 
 	GSWnd* m_window;
 
+	std::string m_font_filepath; // font used for the OSD.
+
 	GLuint m_fbo;				// frame buffer container
 	GLuint m_fbo_read;			// frame buffer container only for reading
 
@@ -461,6 +463,7 @@ class GSDeviceOGL : public GSDevice
 	void DoFXAA(GSTexture* sTex, GSTexture* dTex);
 	void DoShadeBoost(GSTexture* sTex, GSTexture* dTex);
 	void DoExternalFX(GSTexture* sTex, GSTexture* dTex);
+	void DoOSD(GSTexture* dTex);
 
 	void OMAttachRt(GSTextureOGL* rt = NULL);
 	void OMAttachDs(GSTextureOGL* ds = NULL);

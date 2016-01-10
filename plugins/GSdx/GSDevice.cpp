@@ -405,6 +405,16 @@ void GSDevice::ShadeBoost()
 	}
 }
 
+void GSDevice::OSD()
+{
+	// NOTE(remy): Nothing special todo here for the OSD?
+
+	if (m_osd)
+	{
+		DoOSD(m_current);
+	}
+}
+
 bool GSDevice::ResizeTexture(GSTexture** t, int w, int h)
 {
 	if(t == NULL) {ASSERT(0); return false;}

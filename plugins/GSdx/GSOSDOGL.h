@@ -33,4 +33,5 @@ class GSOSDOGL : public GSOSD {
 		virtual ~GSOSDOGL();
 
 		bool generateAtlasTexture();
+		void render();
 };

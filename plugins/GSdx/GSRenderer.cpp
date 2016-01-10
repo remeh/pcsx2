@@ -309,6 +309,9 @@ bool GSRenderer::Merge(int field)
 		{
 			m_dev->FXAA();
 		}
+
+		// TODO(remy): if (osd)
+		m_dev->OSD();
 	}
 
 	GL_POP();

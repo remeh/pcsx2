@@ -432,14 +432,25 @@ bool GSDeviceOGL::Reset(int w, int h)
 	// in the backbuffer
 	m_backbuffer = new GSTextureOGL(GSTextureOGL::Backbuffer, w, h, 0, m_fbo_read);
 
+	// re-create the OSD here
+	// NOTE(remy): not sure that it has to be destroyed on reset in the first place...
+	CreateOSD(m_font_filepath);
+
 	return true;
 }
 
 void GSDeviceOGL::CreateOSD(std::string font_filepath)
 {
-
 	GL_PUSH("GSDeviceOGL::OSD");
 
+	if (font_filepath.size() == 0) {
+		return;
+	}
+
+	// store the font filepath (will be used again on reset)
+	m_font_filepath = font_filepath;
+
+	// create the OSD.
 	GSOSDOGL* osd = new GSOSDOGL(m_fbo_read);
 	osd->init(font_filepath);
 	osd->generateAtlasTexture();
@@ -1273,6 +1284,15 @@ void GSDeviceOGL::DoShadeBoost(GSTexture* sTex, GSTexture* dTex)
 	StretchRect(sTex, sRect, dTex, dRect, m_shadeboost.ps, true);
 
 	GL_POP();
+}
+
+void GSDeviceOGL::DoOSD(GSTexture* dTex)
+{
+	printf("OSD\n");
+	if (m_osd) {
+
+	}
+	// TODO(remy): apply the OSD texture to the screen target.
 }
 
 void GSDeviceOGL::SetupDATE(GSTexture* rt, GSTexture* ds, const GSVertexPT1* vertices, bool datm)

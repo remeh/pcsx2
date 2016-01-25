@@ -37,7 +37,7 @@ class GSOSD {
 		struct OSDLine {
 			std::string text;
 			// TODO(remy): color ?
-			time_t expiration_time;
+			time_t expiration_time; // unit: milliseconds.
 		};
 
 		std::vector<OSDLine> lines;
@@ -69,6 +69,7 @@ class GSOSD {
 
 		void createAtlas();
 		void destroyRes();
+		GSVector4* textVertices(); // the returned vectors must be freed by the caller.
 
 		FT_Library ft;
 		FT_Face face; // loaded font
@@ -78,8 +79,24 @@ class GSOSD {
 		virtual ~GSOSD();
 
 		void init(std::string font_filepath);
-
-		void addLine(std::string text, uint32 seconds);
+		void addLine(std::string text, uint32 milliseconds = 3000);
+		int linesCount() {
+			return lines.size();
+		}
 		void clear();
+
+		void destroyTexture() {
+			delete m_osd_tex;
+			m_osd_tex = NULL;
+		}
+
+		void setTexture(GSTexture* tex) {
+			m_osd_tex = tex;
+		}
+
+		GSTexture* getTexture() {
+			return m_osd_tex;
+		};
+
 		virtual void render() = 0;
 };

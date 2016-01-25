@@ -18,22 +18,23 @@
  *
  */
 
-#include "GSOSDOGL.h"
+#include "GSDeviceOGL.h"
 #include "GSTextureOGL.h"
 
-GSOSDOGL::GSOSDOGL(GLuint fbo_read) :
+GSDeviceOGL::GSOSDOGL::GSOSDOGL(GSDeviceOGL* device, GLuint fbo_read) :
 	GSOSD()
+	, m_device(device)
 	, m_fbo_read(fbo_read)
 {
 	printf("GSOSDOGL(%d)\n", m_fbo_read);
 }
 
-GSOSDOGL::~GSOSDOGL()
+GSDeviceOGL::GSOSDOGL::~GSOSDOGL()
 {
 	printf("~GSOSDOGL()\n");
 }
 
-bool GSOSDOGL::generateAtlasTexture()
+bool GSDeviceOGL::GSOSDOGL::generateAtlasTexture()
 {
 	printf("GSOSD: Generating OGL atlas texture.\n");
 
@@ -50,16 +51,53 @@ bool GSOSDOGL::generateAtlasTexture()
 
 		GlyphInfo glyph = m_atlas.glyphsInfo[i-32];
 		GSVector4i r(glyph.x_offset, 0, glyph.x_offset + glyph.width, glyph.height);
-		m_atlas_tex->Update(r, face->glyph->bitmap.buffer, glyph.width);
+		if (r.width()) {
+			m_atlas_tex->Update(r, face->glyph->bitmap.buffer, glyph.width);
+		}
 	}
 
-	printf("GSOSDOGL: created a texture of %dx%d\n", m_atlas_tex->GetWidth(), m_atlas_tex->GetHeight());
+	printf("GSOSDOGL: created an atlas texture of %dx%d\n", m_atlas_tex->GetWidth(), m_atlas_tex->GetHeight());
 
 	m_atlas.generated = true;
 	return true;
 }
 
-void GSOSDOGL::render()
+void GSDeviceOGL::GSOSDOGL::render()
 {
-	// TODO(remy): re-render the OSD.
+	if (lines.size() == 0) {
+		// TODO(remy): shouldn't we clear m_osd_tex ?
+		return;
+	}
+
+	// the osd target texture hasn't been prepared yet.
+	if (m_osd_tex == NULL) {
+		printf("GSOSDGL: the m_osd_tex isn't ready but render() has already be called.");
+		return;
+	}
+
+	m_device->BeginScene();
+
+	m_device->m_shader->VS(m_device->m_convert.vs);
+	m_device->m_shader->GS(0);
+	m_device->m_shader->PS(m_device->m_convert.ps[18]);
+
+	m_device->OMSetDepthStencilState(m_device->m_convert.dss);
+	//OMSetBlendState(m_convert.bs, 0);
+	//m_device->OMSetBlendState(m_device->m_merge_obj.bs, 0);
+	m_device->OMSetRenderTargets(m_osd_tex, NULL);
+
+	// FIXME that not efficient but let's do a proof-of-concept first
+	GSVector4* vertices = textVertices();
+
+	//m_device->IASetVertexState(m_vb_sr);
+	m_device->IASetVertexBuffer(vertices, 6*lines[0].text.size());
+	m_device->IASetPrimitiveTopology(GL_TRIANGLES);
+
+	m_device->PSSetShaderResource(0, m_atlas_tex);
+	m_device->PSSetSamplerState(m_device->m_convert.pt);
+
+	m_device->DrawPrimitive();
+
+	_aligned_free(vertices);
+	m_device->EndScene();
 }

@@ -85,7 +85,12 @@ void GSOSD::destroyRes()
 {
 	lines.clear();
 
-	if (m_atlas_tex) {
+	if (m_osd_tex != NULL) {
+		delete m_osd_tex;
+		m_osd_tex = NULL;
+	}
+
+	if (m_atlas_tex != NULL) {
 		delete m_atlas_tex;
 		m_atlas_tex = NULL;
 	}
@@ -158,7 +163,7 @@ void GSOSD::clear() {
 // addLine inserts a new line to display into the OSD.
 // If the OSD has too many lines to display, it can
 // decide to remove some.
-void GSOSD::addLine(std::string text, uint32 seconds) {
+void GSOSD::addLine(std::string text, uint32 milliseconds) {
 	if (lines.size() == GSOSD_MAX_LINES) {
 		lines.erase(lines.begin());
 	}
@@ -166,9 +171,69 @@ void GSOSD::addLine(std::string text, uint32 seconds) {
 	OSDLine line;
 	line.text = text;
 	// TODO(remy): compute the expiration time.
-	line.expiration_time = seconds;
+	line.expiration_time = milliseconds;
 
 	lines.push_back(line);
 
 	render();
+}
+
+// textVertices builds the list of vertices to read into m_atlas_ex
+// for chars.
+// The returned vertices must be freed by the caller.
+GSVector4* GSOSD::textVertices()
+{
+	if (lines.size() == 0) {
+		// nothing to render
+		return NULL;
+	}
+
+	// TODO(remy)
+	OSDLine line = lines[0];
+
+	uint32 n = 0;
+	GSVector4* dst = (GSVector4*)_aligned_malloc(6*sizeof(GSVector4)*(line.text.length()), 32);
+	GSVector4 offset(0,0,500,300); // TODO(remy): get window size
+	for (const char* p = line.text.c_str(); *p; p++) {
+		int pos = *p+32;
+
+		float x2 =  offset.x + m_atlas.glyphsInfo[pos].left * offset.w;
+		float y2 = -offset.y - m_atlas.glyphsInfo[pos].top * offset.z;
+		float w = m_atlas.glyphsInfo[pos].width * offset.w;
+		float h = m_atlas.glyphsInfo[pos].height * offset.z;
+
+		/* Advance the cursor to the start of the next character */
+		offset.x += m_atlas.glyphsInfo[pos].rendered_width * offset.w;
+		offset.y += m_atlas.glyphsInfo[pos].rendered_height * offset.z;
+
+		// NOTE: In the future we could use only a SHORT for texture
+		// coordinate. And do the division by the texture size on the vertex
+		// shader (need to drop dx9 compatibility)
+			dst[n++] = GSVector4(
+					x2, -y2,
+					(float)m_atlas.glyphsInfo[pos].x_offset / (float)m_atlas.width, 0.0f
+			);
+			dst[n++] = GSVector4(
+					x2 + w, -y2,
+					(float)(m_atlas.glyphsInfo[pos].x_offset + m_atlas.glyphsInfo[pos].width) / (float)m_atlas.width , 0.0f
+			);
+			dst[n++] = GSVector4(
+					x2, -y2 - h,
+					(float)m_atlas.glyphsInfo[pos].x_offset / m_atlas.width, (float)m_atlas.glyphsInfo[pos].height / (float)m_atlas.height
+			);
+			dst[n++] = GSVector4(
+					x2 + w, -y2,
+					(float)(m_atlas.glyphsInfo[pos].x_offset + m_atlas.glyphsInfo[pos].width) / (float)m_atlas.width , 0.0f
+			);
+			dst[n++] = GSVector4(
+					x2, -y2 - h,
+					(float)m_atlas.glyphsInfo[pos].x_offset / m_atlas.width, (float)m_atlas.glyphsInfo[pos].height / (float)m_atlas.height
+			);
+			dst[n++] = GSVector4(
+					x2 + w, -y2 - h,
+					(float)(m_atlas.glyphsInfo[pos].x_offset + m_atlas.glyphsInfo[pos].width) / (float)m_atlas.width, (float)m_atlas.glyphsInfo[pos].height / (float)m_atlas.height
+			);
+	}
+
+	return dst;
 }

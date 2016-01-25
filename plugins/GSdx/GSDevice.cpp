@@ -407,7 +407,15 @@ void GSDevice::ShadeBoost()
 
 void GSDevice::OSD()
 {
-	// NOTE(remy): Nothing special todo here for the OSD?
+    GSVector2i size = m_current->GetSize();
+	// if null or not the good size
+	if (m_osd->getTexture() == NULL || m_osd->getTexture()->GetSize() != size) {
+		// (re-)init the texture
+		m_osd->destroyTexture();
+		GSTexture* t = CreateRenderTarget(size.x, size.y, false);
+		ClearRenderTarget(t, 0);
+		m_osd->setTexture(t);
+	}
 
 	if (m_osd)
 	{

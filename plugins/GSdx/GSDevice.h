@@ -140,6 +140,9 @@ protected:
 	virtual void DoExternalFX(GSTexture* sTex, GSTexture* dTex) {}
 	virtual void DoOSD(GSTexture* dTex) {}
 
+	virtual void InitOSD() {} // render the atlas texture.
+	virtual void RenderOSD() {} // to internally render the OSD
+
 public:
 	GSDevice();
 	virtual ~GSDevice();

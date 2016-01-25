@@ -451,7 +451,7 @@ void GSDeviceOGL::CreateOSD(std::string font_filepath)
 	m_font_filepath = font_filepath;
 
 	// create the OSD.
-	GSOSDOGL* osd = new GSOSDOGL(m_fbo_read);
+	GSOSDOGL* osd = new GSOSDOGL(this, m_fbo_read);
 	osd->init(font_filepath);
 	osd->generateAtlasTexture();
 	m_osd = osd;
@@ -1288,9 +1288,18 @@ void GSDeviceOGL::DoShadeBoost(GSTexture* sTex, GSTexture* dTex)
 
 void GSDeviceOGL::DoOSD(GSTexture* dTex)
 {
-	printf("OSD\n");
 	if (m_osd) {
+		if (m_osd->linesCount() == 0) {
+			m_osd->addLine("BITE", 3000);
+			m_osd->render();
+			return;
+		}
 
+	    GSVector2i s = dTex->GetSize();
+	    GSVector4 sRect(0, 0, 1, 1);
+	    GSVector4 dRect(0, 0, s.x, s.y);
+		//printf("%p\n", m_osd->getTexture());
+	    StretchRect(m_osd->getTexture(), sRect, dTex, dRect, m_convert.ps[18], true);
 	}
 	// TODO(remy): apply the OSD texture to the screen target.
 }

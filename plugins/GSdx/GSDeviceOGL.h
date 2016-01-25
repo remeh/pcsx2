@@ -440,6 +440,20 @@ class GSDeviceOGL : public GSDevice
 		GSUniformBufferOGL *cb;
 	} m_shadeboost;
 
+	class GSOSDOGL : public GSOSD {
+		private:
+		protected:
+			GSDeviceOGL* m_device;
+			GLuint m_fbo_read;
+
+		public:
+			GSOSDOGL(GSDeviceOGL* device, GLuint m_fbo_read);
+			virtual ~GSOSDOGL();
+
+			bool generateAtlasTexture();
+			void render();
+	};
+
 	GLuint m_vs[1<<5];
 	GLuint m_gs[1<<2];
 	GLuint m_ps_ss[1<<4];
